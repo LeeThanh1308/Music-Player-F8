@@ -26,6 +26,7 @@ const $$ = document.querySelectorAll.bind(document);
     audio.addEventListener('durationchange',function(){
         var caclTimeEnd = caclTimeEnd = ((audio.duration - (parseInt(audio.duration  / 60) * 60)) / 100) + (parseInt(audio.duration  / 60));
         var newTimeEnd = caclTimeEnd.toFixed(2);
+        newTimeEnd = '0' + newTimeEnd;
         span2.textContent = String(newTimeEnd).replace('.', ":");
     });
 
