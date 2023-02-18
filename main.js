@@ -15,9 +15,19 @@ const $$ = document.querySelectorAll.bind(document);
     const btnRamdom = $('.btn-ramdom');
     const btnRepeat = $('.btn-repeat');
     const playlist = $('.playlist');
-    const time = audio.duration;
-    
+    const span1 = $('.span-1');
+    const span2 = $('.span-2');
 
+    // audio.addEventListener('play',function(){
+    //     console.log(audio.duration)
+    // });
+
+    //Lấy ra thời lượng kết thúc của audio
+    audio.addEventListener('durationchange',function(){
+        var caclTimeEnd = caclTimeEnd = ((audio.duration - (parseInt(audio.duration  / 60) * 60)) / 100) + (parseInt(audio.duration  / 60));
+        var newTimeEnd = caclTimeEnd.toFixed(2);
+        span2.textContent = String(newTimeEnd).replace('.', ":");
+    });
 
 const app = {
     currentIndex: 0,
@@ -108,6 +118,7 @@ const app = {
         const _this = this;
         const cdWidth = cd.offsetWidth
 
+
         //Sử lý CD quay / dừng
         const cdThumbAnimation = cdThumb.animate([
             {transform: 'rotate(360deg)'}
@@ -175,6 +186,26 @@ const app = {
 
         //Khi tiến độ bài hát thay đổi
         audio.ontimeupdate = function() {
+
+            function formatTime(sec_num) {
+                let hours = Math.floor(sec_num / 3600);
+                let minutes = Math.floor((sec_num - hours * 3600) / 60);
+                let seconds = Math.floor(sec_num - hours * 3600 - minutes * 60);
+            
+                hours = hours < 10 ? (hours > 0 ? '0' + hours : 0) : hours;
+            
+                if (minutes < 10) {
+                    minutes = '0' + minutes;
+                }
+                if (seconds < 10) {
+                    seconds = '0' + seconds;
+                }
+                return (hours !== 0 ? hours + ':' : '') + minutes + ':' + seconds;
+            }
+
+            span1.textContent = formatTime(audio.currentTime); 
+
+
             if(audio.duration) {
                 const progressPercent = Math.floor(audio.currentTime / audio.duration * 100)
                 progress.value = progressPercent;
@@ -195,6 +226,7 @@ const app = {
                 _this.nextSong();
             }
             audio.play();
+            
         }
         nextLeft.onclick = function() {
             if(_this.isRamdom) {
@@ -227,7 +259,7 @@ const app = {
         //Lắng nghe hành vi click vào list nhạc
         playlist.onclick =  function (e) {
             const songNode = e.target.closest('.song:not(.active)');
-           if (songNode || e.target.closest('.option')) {
+            if (songNode || e.target.closest('.option')) {
                 //Xử lý khi click vào list song
                 if(songNode) {
                     // console.log(songNode.getAttribute('data-index'));
@@ -242,7 +274,7 @@ const app = {
                 if(e.target.closest('.option')) {
 
                 }
-           };
+            };
         }
     },
 
@@ -253,11 +285,9 @@ const app = {
     },
 
     loadCurrentSong: function() {
-
         heading.textContent = this.currentSong.name;
         cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
         audio.src = this.currentSong.path;
-        
     },
     loadConfig: function() {
         this.isRamdom = this.config.isRamdom;
@@ -288,6 +318,10 @@ const app = {
 
         this.currentIndex = newIndex
         this.loadCurrentSong();
+    },
+    getTimeStartEnd: function() {
+        span1.textContent = _this.audio.currentTime;
+        span2.textContent = _this.audio.duration;
     },
     start: function() {
         // Gán cấu hình từ config vào ứng dụng
